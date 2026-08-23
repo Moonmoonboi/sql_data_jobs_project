@@ -1,6 +1,6 @@
 # Querying My Way Into the Data Analyst Job Market
 
-A SQL project built entirely in T-SQL / SQL Server Management Studio — five queries against a real job-postings dataset, each one answering a question I actually wanted answered before job hunting as a data analyst: which jobs pay the most, what they ask for, which skills are most in demand, which skills pay the most overall, and which skills are actually worth learning first.
+A SQL project built entirely in T-SQL / SQL Server Management Studio, five queries against a real job-postings dataset, each one answering a question I actually wanted answered before job hunting as a data analyst: which jobs pay the most, what they ask for, which skills are most in demand, which skills pay the most overall, and which skills are actually worth learning first.
 
 ## Contents
 
@@ -18,11 +18,11 @@ A SQL project built entirely in T-SQL / SQL Server Management Studio — five qu
 
 ## Introduction
 
-This project started as a straightforward question: **if I were job-hunting as a data analyst right now, what should I actually learn — and what should I expect to get paid for it?** Rather than trust a listicle, I decided to answer it myself, directly from job-posting data, in SQL.
+This project started as a straightforward question: **if I were job-hunting as a data analyst right now, what should I actually learn and what should I expect to get paid for it?** Rather than trust a listicle, I decided to answer it myself, directly from job-posting data, in SQL.
 
-The result is five connected queries that build on each other: first finding the highest-paying Data Analyst roles, then the skills those specific roles ask for, then the skills most in demand across the whole market, then which individual skills pay the most, and finally combining pay with demand to find the skills that are worth learning first — not just the ones that pay the most in theory.
+The result is five connected queries that build on each other: first finding the highest-paying Data Analyst roles, then the skills those specific roles ask for, then the skills most in demand across the whole market, then which individual skills pay the most, and finally combining pay with demand to find the skills that are worth learning first, not just the ones that pay the most in theory.
 
-Every query below ran against a live SQL Server database, and every chart is built from its actual result set — nothing here is illustrative.
+Every query below ran against a live SQL Server database, and every chart is built from its actual result set and nothing here is illustrative.
 
 ## Background
 
@@ -104,7 +104,7 @@ ORDER BY j.salary_year_avg DESC;
 
 ### Query 2 — Skills required by those top-paying jobs
 
-Same 8 jobs — this time unpacking which specific skills each one listed, to see what the highest earners actually have in common.
+Same 8 jobs and this time unpacking which specific skills each one listed, to see what the highest earners actually have in common.
 
 <details>
 <summary>View query</summary>
