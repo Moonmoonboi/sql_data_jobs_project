@@ -121,4 +121,18 @@ into the top paying jobs
     "avg_salary": 115480.0
   }
 ]
+
+The most trustworthy signal here is the ML/AI framework cluster (DataRobot, MXNet, Keras, PyTorch, Hugging Face,
+and TensorFlow) all land in a tight $120K–$155K band. Six different skills converging on a similar range is a much 
+stronger signal than any single outlier, and it lines up with the general market pattern of deep-learning and MLOps
+skills commanding a premium over traditional BI/reporting tools.
+
+The infra/DevOps cluster (VMware, Terraform, Kafka, Puppet, Ansible, Airflow) tells a similar story in a slightly 
+lower band ($116K–$148K) where infrastructure-as-code and data-pipeline orchestration tools consistently pay above the 
+median, which tracks with how in-demand platform/data engineering skills have been.
+
+The version control & collaboration group is the one to be skeptical of: it contains both the single highest value 
+on the whole list (SVN, $400K) and several of the lowest (Bitbucket, Atlassian, Notion, all ~$116K–$118K). That's 
+not really a coherent "this category pays well" story — it's one extreme outlier sitting next to an otherwise
+unremarkable cluster of everyday collaboration tools.
 */
