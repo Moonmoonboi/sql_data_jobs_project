@@ -1,7 +1,6 @@
 # Querying My Way Into the Data Analyst Job Market
 
-A SQL project built entirely in T-SQL / SQL Server Management Studio — five queries against a real job-postings dataset, each one answering a question I actually wanted answered before job hunting as a data analyst: which jobs pay the most, what they ask for, which skills pay the most overall, and which skills are actually worth learning first.
-
+A SQL project built entirely in T-SQL / SQL Server Management Studio — five queries against a real job-postings dataset, each one answering a question I actually wanted answered before job hunting as a data analyst: which jobs pay the most, what they ask for, which skills are most in demand, which skills pay the most overall, and which skills are actually worth learning first.
 
 ## Contents
 
@@ -11,8 +10,9 @@ A SQL project built entirely in T-SQL / SQL Server Management Studio — five qu
 - [The Analysis](#the-analysis)
   - [Query 1 — Top Paying Jobs](#query-1--top-paying-data-analyst-jobs)
   - [Query 2 — Skills for Those Jobs](#query-2--skills-required-by-those-top-paying-jobs)
-  - [Query 3 — Top Paying Skills](#query-3--top-paying-skills-across-all-data-analyst-postings)
-  - [Query 4 — Optimal Skills](#query-4--optimal-skills--demand-and-salary-together)
+  - [Query 3 — Top In-Demand Skills](#query-3--top-5-in-demand-skills-for-data-analysts)
+  - [Query 4 — Top Paying Skills](#query-4--top-paying-skills-across-all-data-analyst-postings)
+  - [Query 5 — Optimal Skills](#query-5--optimal-skills-demand-and-salary-together)
 - [What I Learned](#what-i-learned)
 - [Conclusions](#conclusions)
 
@@ -20,7 +20,7 @@ A SQL project built entirely in T-SQL / SQL Server Management Studio — five qu
 
 This project started as a straightforward question: **if I were job-hunting as a data analyst right now, what should I actually learn — and what should I expect to get paid for it?** Rather than trust a listicle, I decided to answer it myself, directly from job-posting data, in SQL.
 
-The result is four connected queries that build on each other: first finding the highest-paying Data Analyst roles, then the skills those specific roles ask for, then zooming out to see which skills pay the most across the whole dataset, and finally combining pay with demand to find the skills that are worth learning first — not just the ones that pay the most in theory.
+The result is five connected queries that build on each other: first finding the highest-paying Data Analyst roles, then the skills those specific roles ask for, then the skills most in demand across the whole market, then which individual skills pay the most, and finally combining pay with demand to find the skills that are worth learning first — not just the ones that pay the most in theory.
 
 Every query below ran against a live SQL Server database, and every chart is built from its actual result set — nothing here is illustrative.
 
@@ -130,7 +130,43 @@ ORDER BY j.salary_year_avg DESC;
 
 SQL and Python are the only two skills every top earner had in common — everything past that (Tableau, R, cloud tooling) is more situational, and 15 more skills each showed up on exactly one posting.
 
-### Query 3 — Top paying skills, across all Data Analyst postings
+### Query 3 — Top 5 in-demand skills for Data Analysts
+
+Stepping back from those 8 jobs to the full market: across *every* Data Analyst posting (not just the top-paying or remote ones), which skills show up most often?
+
+<details>
+<summary>View query</summary>
+
+```sql
+SELECT TOP 5
+    CAST(skills AS NVARCHAR(225)) AS skills,
+    COUNT(s.job_id) AS demand_count
+FROM job_postings_fact j
+INNER JOIN skills_job_dim s ON j.job_id = s.job_id
+INNER JOIN skills_dim sd ON sd.skill_id = s.skill_id
+WHERE job_title_short = 'Data Analyst'
+GROUP BY CAST(skills AS NVARCHAR(225))
+ORDER BY demand_count DESC;
+```
+
+</details>
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/q3_top_demand_skills_dark.png">
+  <img src="assets/q3_top_demand_skills_light.png" alt="Bar chart of the top 5 most in-demand skills across all Data Analyst postings" width="640">
+</picture>
+
+| Skill | Postings |
+|---|---:|
+| SQL | 92,628 |
+| Excel | 67,031 |
+| Python | 57,326 |
+| Tableau | 46,554 |
+| Power BI | 39,468 |
+
+The scale here is a good reminder of what "demand" actually means in each query on this page: this is every posting in the dataset, which is why the counts jump from the low hundreds (Query 2's 8-job sample) into the tens of thousands. Excel outranking Python is the interesting result — Query 2's top-paying jobs leaned Python over Excel, but once on-site and lower-paying roles are included, Excel's broader baseline demand pulls it ahead. SQL, Excel, Python, Tableau, and Power BI form the real baseline toolkit most Data Analyst postings expect, regardless of pay tier.
+
+### Query 4 — Top paying skills, across all Data Analyst postings
 
 Zooming out from 8 jobs to the whole dataset: which individual skills are associated with the highest average salary?
 
@@ -153,15 +189,15 @@ ORDER BY avg_salary DESC;
 </details>
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/q3_top_paying_skills_dark.png">
-  <img src="assets/q3_top_paying_skills_light.png" alt="Bar chart of the top 12 skills ranked by average salary, with SVN flagged as an outlier" width="640">
+  <source media="(prefers-color-scheme: dark)" srcset="assets/q4_top_paying_skills_dark.png">
+  <img src="assets/q4_top_paying_skills_light.png" alt="Bar chart of the top 12 skills ranked by average salary, with SVN flagged as an outlier" width="640">
 </picture>
 
-> **SVN's $400K is almost certainly noise, not signal.** This query has no posting-count column — SVN's average is more than 3× the next-highest skill, the classic signature of an average built from one or two postings. Confirmed with a follow-up query adding `COUNT(job_id)`, which is exactly what Query 4 does.
+> **SVN's $400K is almost certainly noise, not signal.** This query has no posting-count column — SVN's average is more than 3× the next-highest skill, the classic signature of an average built from one or two postings. Confirmed with a follow-up query adding `COUNT(job_id)`, which is exactly what Query 5 does.
 
-### Query 4 — Optimal skills, demand *and* salary together
+### Query 5 — Optimal skills, demand *and* salary together
 
-The fix for Query 3's blind spot: pairing average salary with how many postings actually ask for each skill, so a real signal can be told apart from a lucky outlier.
+The fix for Query 4's blind spot: pairing average salary with how many postings actually ask for each skill, so a real signal can be told apart from a lucky outlier.
 
 <details>
 <summary>View query</summary>
@@ -196,25 +232,25 @@ ORDER BY d.demand_count DESC;
 </details>
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/q4_demand_vs_salary_dark.png">
-  <img src="assets/q4_demand_vs_salary_light.png" alt="Scatter plot of skill demand versus average salary, quadrants split at the median" width="640">
+  <source media="(prefers-color-scheme: dark)" srcset="assets/q5_demand_vs_salary_dark.png">
+  <img src="assets/q5_demand_vs_salary_light.png" alt="Scatter plot of skill demand versus average salary, quadrants split at the median" width="640">
 </picture>
 
 SQL, Python, Tableau, and R (teal) cleared both medians — the actual answer to the question this whole project started with. Snowflake, Looker, and Hadoop sit at moderate demand but punch well above median pay, a real signal since it's backed by dozens of postings rather than one or two.
 
 ## What I Learned
 
-Getting to those four result sets meant working through a string of real problems along the way. Logging them here because each one changed how I write queries now.
+Getting to those five result sets meant working through a string of real problems along the way. Logging them here because each one changed how I write queries now.
 
 | # | Category | What happened | Fix |
 |---|---|---|---|
 | 1 | Aggregation | `MAX()` on a value already formatted as a string (`CONCAT(..., '%')`) sorts alphabetically, not numerically — `'9.8%'` outranks `'17.2%'` as text | Aggregate the raw number first, format last |
 | 2 | Data types | `ROUND()` on a `FLOAT` looks right on screen, then reveals its binary imprecision once `CONCAT`'d into text | Cast the rounded value to `DECIMAL` before concatenating |
-| 3 | CTEs | Writing `) d` right after a CTE body is invalid syntax — this was the actual bug behind Query 4 | Alias belongs in the outer query's `FROM`/`JOIN`, exactly like a table alias |
+| 3 | CTEs | Writing `) d` right after a CTE body is invalid syntax — this was the actual bug behind Query 5 | Alias belongs in the outer query's `FROM`/`JOIN`, exactly like a table alias |
 | 4 | Referential integrity | `TRUNCATE` refuses to run if *any* FK references the table, even with zero matching child rows | Clear or reorder around the child table first, or use `DELETE` instead |
 | 5 | ETL | The Import Flat File wizard rebuilds its table from scratch on every run — manually widening a column afterward did nothing | Pre-create the table and load with `BULK INSERT` instead |
 | 6 | Results hygiene | `sas` appeared twice under two different `skill_id`s with identical demand and salary — a dirty dimension row | Would double-count in any downstream `SUM()` if left unchecked |
-| 7 | Statistics | An average with no sample size attached can't be trusted — Query 3's $400K SVN result looked like a finding until Query 4 added a demand count | Never ship a `GROUP BY … AVG()` without a `COUNT()` next to it |
+| 7 | Statistics | An average with no sample size attached can't be trusted — Query 4's $400K SVN result looked like a finding until Query 5 added a demand count | Never ship a `GROUP BY … AVG()` without a `COUNT()` next to it |
 
 ## Conclusions
 
@@ -227,6 +263,10 @@ Past that baseline, **Snowflake, Looker, and Oracle** stood out as genuine diffe
 | Learn first | SQL, Python, Tableau, R | High demand *and* above-median pay, together |
 | Learn to differentiate | Snowflake, Looker, Oracle | Fewer postings ask, but the ones that do pay well |
 | Always double-check | — | Pair every `AVG()` with a `COUNT()` before trusting what it's telling you |
+
+---
+
+<sub>Based on a 2023 snapshot of Data Analyst job postings. Queries and analysis by me; charts generated from each query's actual result set.</sub>
 
 ---
 
