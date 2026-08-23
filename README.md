@@ -268,6 +268,3 @@ Past that baseline, **Snowflake, Looker, and Oracle** stood out as genuine diffe
 
 <sub>Based on a 2023 snapshot of Data Analyst job postings. Queries and analysis by me; charts generated from each query's actual result set.</sub>
 
----
-
-<sub>Based on a 2023 snapshot of Data Analyst job postings. Queries and analysis by me; charts generated from each query's actual result set.</sub>
